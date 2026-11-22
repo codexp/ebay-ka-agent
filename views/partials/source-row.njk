@@ -1,12 +1,7 @@
 <tbody id="source-group-{{ source.id }}" class="{{ 'source-inactive' if not source.active }}">
   <tr>
     <td data-label="Name">
-      <span class="source-name-cell">
-        <strong>{{ source.name }}</strong>
-        {% if source.last_error %}
-          <div class="source-error">{{ source.last_error }}</div>
-        {% endif %}
-      </span>
+      <strong>{{ source.name }}</strong>
     </td>
     <td data-label="URL">
       <a href="{{ source.url }}" target="_blank" class="url-truncate">{{ source.url }}</a>
@@ -14,36 +9,42 @@
     <td data-label="Listings">{{ source.item_count }}</td>
     <td data-label="Last">{{ relativeTime(source.last_scraped_at) }}</td>
     <td data-label="Interval">{{ source.interval }} min</td>
-    <td class="actions">
-      <button class="btn btn-sm"
-              hx-post="/sources/{{ source.id }}/scrape"
-              hx-target="#scrape-status-{{ source.id }}"
-              hx-swap="innerHTML"
-              hx-indicator="#scrape-spinner-{{ source.id }}"
-              hx-disabled-elt="this">
-        Scrape
-        <span id="scrape-spinner-{{ source.id }}" class="htmx-indicator spinner"></span>
-      </button>
-      <a class="btn btn-sm" href="/sources/{{ source.id }}/edit">Edit</a>
-      <button class="toggle-btn {{ 'active' if source.active }}"
-              hx-patch="/sources/{{ source.id }}/toggle"
-              hx-target="#source-group-{{ source.id }}"
-              hx-swap="outerHTML">
-        {{ 'Active' if source.active else 'Inactive' }}
-      </button>
-      <button class="btn btn-sm btn-icon btn-danger"
-              hx-delete="/sources/{{ source.id }}"
-              hx-target="#source-group-{{ source.id }}"
-              hx-swap="delete"
-              hx-confirm="Delete source '{{ source.name }}'?"
-              title="Delete">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      </button>
+    <td class="source-actions-cell">
+      <div class="actions">
+        <button class="btn btn-sm"
+                hx-post="/sources/{{ source.id }}/scrape"
+                hx-target="#scrape-status-{{ source.id }}"
+                hx-swap="innerHTML"
+                hx-indicator="#scrape-spinner-{{ source.id }}"
+                hx-disabled-elt="this">
+          Scrape
+          <span id="scrape-spinner-{{ source.id }}" class="htmx-indicator spinner"></span>
+        </button>
+        <a class="btn btn-sm" href="/sources/{{ source.id }}/edit">Edit</a>
+        <button class="toggle-btn {{ 'active' if source.active }}"
+                hx-patch="/sources/{{ source.id }}/toggle"
+                hx-target="#source-group-{{ source.id }}"
+                hx-swap="outerHTML">
+          {{ 'Active' if source.active else 'Inactive' }}
+        </button>
+        <button class="btn btn-sm btn-icon btn-danger"
+                hx-delete="/sources/{{ source.id }}"
+                hx-target="#source-group-{{ source.id }}"
+                hx-swap="delete"
+                hx-confirm="Delete source '{{ source.name }}'?"
+                title="Delete">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
     </td>
   </tr>
   <tr class="source-status-row">
     <td colspan="6">
-      <div id="scrape-status-{{ source.id }}" class="scrape-status-cell"></div>
+      <div id="scrape-status-{{ source.id }}" class="scrape-status-cell">
+        {% if source.last_error %}
+          <span class="scrape-result scrape-result--error">Error: {{ source.last_error }}</span>
+        {% endif %}
+      </div>
     </td>
   </tr>
 </tbody>

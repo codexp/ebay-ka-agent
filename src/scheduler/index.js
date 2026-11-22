@@ -83,17 +83,25 @@ async function runJob(sourceId, job) {
 
   console.log(`[scheduler] Scraping source ${source.id} (${source.name})`);
   const pingInterval = setInterval(() => ping(source.id), PING_INTERVAL_MS);
+  let failed = false;
   try {
     const stats = await scrapeSource(source.id);
     complete(source.id, stats, null);
     console.log(`[scheduler] Source ${source.id} done:`, stats);
   } catch (err) {
+    failed = true;
     complete(source.id, null, err.message);
     console.error(`[scheduler] Source ${source.id} error:`, err.message);
   } finally {
     clearInterval(pingInterval);
     const refreshed = loadSource(source.id);
-    if (refreshed && refreshed.active && !job.stopped) scheduleNext(refreshed, job);
+    if (refreshed?.active && !job.stopped) {
+      if (failed) {
+        setJobTimer(job, getEffectiveIntervalMinutes(refreshed) * 60 * 1000);
+      } else {
+        scheduleNext(refreshed, job);
+      }
+    }
   }
 }
 
